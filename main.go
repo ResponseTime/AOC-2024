@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+
+	"github.com/responsetime/aoc/solutions"
 )
 
 func main() {
@@ -34,4 +37,9 @@ func main() {
 	// sol := solutions.DayFivePartOne(lines)
 	// sol := solutions.DayFivePartTwo(lines)
 	// fmt.Println(sol)
+
+	//Day 6 P1 P2
+	// sol := solutions.DaySixPartOne(lines)
+	sol := solutions.DaySixPartTwo(lines)
+	fmt.Println(sol)
 }
