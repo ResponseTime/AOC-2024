@@ -18,62 +18,64 @@ type point struct {
 // var obstaclePath []point
 // var objsPlaced int
 
-func goPath(graph [][]string, Direction, i, j, distinct int, seen map[point]bool) int {
+func goPath(graph [][]string, Direction, i, j, distinct int, seen map[traveller]bool) (int, bool) {
 	if i < 0 || i >= len(graph) || j < 0 || j >= len(graph[0]) {
-		return distinct
+		return distinct, false
 	}
-	p := point{x: i, y: j}
+	p := traveller{x: i, y: j, Direction: Direction}
 	// for _, pointCheck := range obstaclePath {
 	// 	if p.x == pointCheck.x || p.y == pointCheck.y {
 	// 		objsPlaced++
 	// 		break
 	// 	}
 	// }
-	_, ok := seen[p]
+	val, ok := seen[p]
+	if val {
+		return 0, true
+	}
 	if !ok {
-		graph[i][j] = "X"
+		// graph[i][j] = "X"
 		distinct++
 	}
 	seen[p] = true
 	switch Direction {
 	case UP:
 		if i-1 < 0 {
-			return distinct
+			return distinct, false
 		}
 		if graph[i-1][j] == "#" {
-			// obstaclePath = append(obstaclePath, point{x: i - 1, y: j})
-			return goPath(graph, RIGHT, i, j+1, distinct, seen)
+			return goPath(graph, RIGHT, i, j, distinct, seen)
 		}
-		return goPath(graph, UP, i-1, j, distinct, seen)
-	case DOWN:
-		if i+1 >= len(graph) {
-			return distinct
-		}
-		if graph[i+1][j] == "#" {
-			// obstaclePath = append(obstaclePath, point{x: i + 1, y: j})
-			return goPath(graph, LEFT, i, j-1, distinct, seen)
-		}
-		return goPath(graph, DOWN, i+1, j, distinct, seen)
+		return goPath(graph, UP, i-1, j, distinct+1, seen)
+
 	case RIGHT:
 		if j+1 >= len(graph[0]) {
-			return distinct
+			return distinct, false
 		}
 		if graph[i][j+1] == "#" {
-			// obstaclePath = append(obstaclePath, point{x: i, y: j + 1})
-			return goPath(graph, DOWN, i+1, j, distinct, seen)
+			return goPath(graph, DOWN, i, j, distinct, seen)
 		}
-		return goPath(graph, RIGHT, i, j+1, distinct, seen)
+		return goPath(graph, RIGHT, i, j+1, distinct+1, seen)
+
+	case DOWN:
+		if i+1 >= len(graph) {
+			return distinct, false
+		}
+		if graph[i+1][j] == "#" {
+			return goPath(graph, LEFT, i, j, distinct, seen)
+		}
+		return goPath(graph, DOWN, i+1, j, distinct+1, seen)
+
 	case LEFT:
 		if j-1 < 0 {
-			return distinct
+			return distinct, false
 		}
 		if graph[i][j-1] == "#" {
-			// obstaclePath = append(obstaclePath, point{x: i, y: j - 1})
-			return goPath(graph, UP, i-1, j, distinct, seen)
+			return goPath(graph, UP, i, j, distinct, seen)
 		}
-		return goPath(graph, LEFT, i, j-1, distinct, seen)
+		return goPath(graph, LEFT, i, j-1, distinct+1, seen)
 	}
-	return 0
+	return 0, false
 }
 
 func DaySixPartOne(lines []string) int {
@@ -88,7 +90,7 @@ func DaySixPartOne(lines []string) int {
 		}
 	}
 	fmt.Println(startPoint)
-	res = goPath(graph, startPoint.Direction, startPoint.x, startPoint.y, 0, map[point]bool{})
+	res, _ = goPath(graph, startPoint.Direction, startPoint.x, startPoint.y, 0, map[traveller]bool{})
 	for _, row := range graph {
 		fmt.Println(row)
 	}
@@ -106,11 +108,22 @@ func DaySixPartTwo(lines []string) int {
 			startPoint.Direction = UP
 		}
 	}
-	fmt.Println(startPoint)
-	goPath(graph, startPoint.Direction, startPoint.x, startPoint.y, 0, map[point]bool{})
-	// res = objsPlaced
-	for _, row := range graph {
-		fmt.Println(row)
+	for i := 0; i < len(graph); i++ {
+		for j := 0; j < len(graph[0]); j++ {
+			if graph[i][j] == "." {
+				graph[i][j] = "#"
+				if _, cycle := goPath(graph, startPoint.Direction, startPoint.x, startPoint.y, 0, map[traveller]bool{}); cycle {
+					res++
+				}
+				graph[i][j] = "."
+			}
+		}
 	}
+	fmt.Println(startPoint)
+	// goPath(graph, startPoint.Direction, startPoint.x, startPoint.y, 0, map[point]bool{})
+	// res = objsPlaced
+	// for _, row := range graph {
+	// 	fmt.Println(row)
+	// }
 	return res
 }
