@@ -40,6 +40,11 @@ func main() {
 
 	//Day 6 P1 P2
 	// sol := solutions.DaySixPartOne(lines)
-	sol := solutions.DaySixPartTwo(lines)
+	// sol := solutions.DaySixPartTwo(lines)
+	// fmt.Println(sol)
+
+	//Day 7 P1 P2
+	// sol := solutions.DaySevenPartOne(lines)
+	sol := solutions.DaySevenPartTwo(lines)
 	fmt.Println(sol)
 }
